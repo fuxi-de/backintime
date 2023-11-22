@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	b64 "encoding/base64"
 	"fmt"
 	"fuxifuchs/backintime/src/services"
+	"fuxifuchs/backintime/src/templates"
 	"io"
 	"log"
 	"net/http"
@@ -47,8 +49,11 @@ func main() {
 
 	e := echo.New()
 
+	e.Static("/static", "assets")
+
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
+		homepage := templates.Hello("Flori")
+		return homepage.Render(context.Background(), c.Response().Writer)
 	})
 
 	e.GET("/auth/login", func(c echo.Context) error {
