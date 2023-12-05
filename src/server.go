@@ -52,7 +52,7 @@ func main() {
 	e.Static("/static", "assets")
 
 	e.GET("/", func(c echo.Context) error {
-		homepage := templates.Hello("Flori")
+		homepage := templates.Hello("Florian")
 		return homepage.Render(context.Background(), c.Response().Writer)
 	})
 
