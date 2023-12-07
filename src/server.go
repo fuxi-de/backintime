@@ -57,7 +57,6 @@ func main() {
 	})
 
 	e.GET("/auth/login", func(c echo.Context) error {
-
 		scope := "streaming user-read-email user-read-private"
 
 		spotifyAuthorizationUrl := "https://accounts.spotify.com/authorize/"
@@ -82,7 +81,6 @@ func main() {
 	})
 
 	e.GET("/auth/callback", func(c echo.Context) error {
-
 		code := c.QueryParam("code")
 
 		spotifyTokenEndpoint := "https://accounts.spotify.com/api/token"
@@ -112,8 +110,14 @@ func main() {
 		}
 
 		user := userService.CreateNewUser(string(b))
-		fmt.Println(user)
-		return c.String(http.StatusOK, "done")
+
+		return c.Redirect(302, "/token/"+user.Mail)
+	})
+
+	e.GET("/token/:user", func(c echo.Context) error {
+		token := userService.GetAccessToken(c.Param("user"))
+		tokenPage := templates.UserPage("Flo", token.Token)
+		return tokenPage.Render(context.Background(), c.Response().Writer)
 	})
 
 	e.Logger.Fatal(e.Start(":1312"))

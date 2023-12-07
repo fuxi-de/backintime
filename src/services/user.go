@@ -3,6 +3,7 @@ package services
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -35,21 +36,20 @@ type UserEntry struct {
 }
 
 func (us *UserService) SaveUser(userData UserData) *UserEntry {
-
-	token := &UserEntry{
+	user := &UserEntry{
 		ID:       uuid.New().String(),
 		UserData: userData,
 	}
 
 	sqlStmt := `
-	insert into users(id, token, name, mail) values(?, ?, ?, ?)
+	insert or replace into users(id, token, name, mail) values(?, ?, ?, ?)
 	`
-	_, err := us.DB.Exec(sqlStmt, token.ID, token.Token, token.Name, token.Mail)
+	_, err := us.DB.Exec(sqlStmt, user.ID, user.Token, user.Name, user.Mail)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 		return nil
 	}
-	return token
+	return user
 }
 
 func (us *UserService) GetUserInfo(token string) *UserData {
@@ -100,4 +100,24 @@ func (us *UserService) CreateNewUser(tokenResponse string) *UserEntry {
 	userData.Token = tokenResponse
 
 	return us.SaveUser(*userData)
+}
+
+func (us *UserService) GetAccessToken(email string) *TokenResponse {
+	fmt.Println("getting token from db for: " + email)
+
+	stmt, err := us.DB.Prepare("select token from users where mail = ?")
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	defer stmt.Close()
+	var token string
+	err = stmt.QueryRow(email).Scan(&token)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	var accessToken TokenResponse
+	json.Unmarshal([]byte(token), &accessToken)
+	return &accessToken
 }
