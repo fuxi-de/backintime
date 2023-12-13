@@ -9,3 +9,7 @@ templ Hello(name string) {
 	<p>again</p>
 	<button type="button">Login</button>
 }
+
+templ HomePage(name string) {
+	@Layout(Hello(name))
+}
