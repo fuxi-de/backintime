@@ -122,5 +122,10 @@ func main() {
 		return tokenPage.Render(context.Background(), c.Response().Writer)
 	})
 
+	e.GET("/play/:user/:device", func(c echo.Context) error {
+		token := userService.GetAccessToken(c.Param("user"))
+		userService.PlaySong("something", token.Token, c.Param("device"))
+		return c.String(200, "done")
+	})
 	e.Logger.Fatal(e.Start(":1312"))
 }
