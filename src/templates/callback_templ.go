@@ -10,17 +10,17 @@ import "context"
 import "io"
 import "bytes"
 
-func handleUser() templ.ComponentScript {
+func saveToken(token string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_handleUser_9abf`,
-		Function: `function __templ_handleUser_9abf(){const token = localStorage.getItem("backInTime-token")
-  setTimeout(() => htmx.ajax('GET', '/user/', { target: "#content", headers: { Authorization: "Bearer "+token}}), 3000)}`,
-		Call:       templ.SafeScript(`__templ_handleUser_9abf`),
-		CallInline: templ.SafeScriptInline(`__templ_handleUser_9abf`),
+		Name: `__templ_saveToken_3250`,
+		Function: `function __templ_saveToken_3250(token){localStorage.setItem("backInTime-token", token)
+  setTimeout(() => htmx.ajax('GET', '/redirect', { headers: { Authorization: "Bearer "+token}}), 3000)}`,
+		Call:       templ.SafeScript(`__templ_saveToken_3250`, token),
+		CallInline: templ.SafeScriptInline(`__templ_saveToken_3250`, token),
 	}
 }
 
-func Hello(name string) templ.Component {
+func callback(token string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -33,11 +33,29 @@ func Hello(name string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section id=\"content\"></section>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = handleUser().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Var2 := `Successfully logged in using Spotify!`
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var3 := `Redirecting to the App.`
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = saveToken(token).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -48,7 +66,7 @@ func Hello(name string) templ.Component {
 	})
 }
 
-func HomePage(name string) templ.Component {
+func CallbackPage(token string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -56,12 +74,12 @@ func HomePage(name string) templ.Component {
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var2 == nil {
-			templ_7745c5c3_Var2 = templ.NopComponent
+		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var4 == nil {
+			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Layout(Hello(name)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout(callback(token)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

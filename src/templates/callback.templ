@@ -1,0 +1,18 @@
+package templates
+
+script saveToken(token string) {
+  localStorage.setItem("backInTime-token", token)
+  setTimeout(() => htmx.ajax('GET', '/redirect', { headers: { Authorization: "Bearer "+token}}), 3000)
+}
+
+templ callback(token string) {
+	<p>
+		Successfully logged in using Spotify!
+		Redirecting to the App.
+	</p>
+	@saveToken(token)
+}
+
+templ CallbackPage(token string) {
+	@Layout(callback(token))
+}

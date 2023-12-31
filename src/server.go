@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	b64 "encoding/base64"
 	"fmt"
+	"fuxifuchs/backintime/src/middleware"
 	"fuxifuchs/backintime/src/services"
 	"fuxifuchs/backintime/src/templates"
 	"io"
@@ -32,7 +33,7 @@ func main() {
 	defer db.Close()
 
 	sqlStmt := `
-	create table if not exists users (id text not null primary key, name text not null, mail text not null, token text);
+	create table if not exists tokens (id text not null primary key, token text not null, refresh_token text not null, expires integer not null);
 	`
 	_, err = db.Exec(sqlStmt)
 	if err != nil {
@@ -43,7 +44,7 @@ func main() {
 	spotifyClientId := os.Getenv("SPOTIFY_CLIENT_ID")
 	spotifyClientSecret := os.Getenv("SPOTIFY_CLIENT_SECRET")
 
-	userService := &services.UserService{
+	tokenService := &services.TokenService{
 		DB: db,
 	}
 
@@ -56,6 +57,11 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		homepage := templates.HomePage("Florian")
 		return homepage.Render(context.Background(), c.Response().Writer)
+	})
+
+	e.GET("/login", func(c echo.Context) error {
+		loginPage := templates.LoginPage()
+		return loginPage.Render(context.Background(), c.Response().Writer)
 	})
 
 	e.GET("/auth/login", func(c echo.Context) error {
@@ -110,22 +116,41 @@ func main() {
 		if err != nil {
 			log.Fatalln(err)
 		}
-
-		user := userService.CreateNewUser(string(b))
-
-		return c.Redirect(302, "/token/"+user.Mail)
+		tokenEntry := tokenService.CreateNewUser(string(b))
+		callbackPage := templates.CallbackPage(tokenEntry.Token)
+		return callbackPage.Render(context.Background(), c.Response().Writer)
 	})
 
-	e.GET("/token/:user", func(c echo.Context) error {
-		token := userService.GetAccessToken(c.Param("user"))
-		tokenPage := templates.UserPage("Flo", token.Token)
-		return tokenPage.Render(context.Background(), c.Response().Writer)
-	})
-
-	e.GET("/play/:user/:device", func(c echo.Context) error {
-		token := userService.GetAccessToken(c.Param("user"))
-		userService.PlaySong("something", token.Token, c.Param("device"))
+	e.GET("/redirect", func(c echo.Context) error {
+		target := c.QueryParam("target")
+		fmt.Println(target)
+		c.Response().Header().Set("HX-Redirect", "/")
 		return c.String(200, "done")
 	})
+	r := e.Group("/user")
+	{
+		r.Use(middleware.Auth)
+		r.GET("/", func(c echo.Context) error {
+			fmt.Println("/user/ called")
+			token := c.Get("token")
+			if str, ok := token.(string); ok {
+				userPage := templates.User("Flo", str)
+				return userPage.Render(context.Background(), c.Response().Writer)
+			} else {
+				return c.Redirect(302, "/login")
+			}
+		})
+		r.GET("/play/:device/:category", func(c echo.Context) error {
+			token := c.Get("token")
+			if str, ok := token.(string); ok {
+				tokenService.PlaySong(c.Param("category"), str, c.Param("device"))
+				return c.String(200, "done")
+			} else {
+				return c.Redirect(302, "/login")
+			}
+		})
+
+	}
+
 	e.Logger.Fatal(e.Start(":1312"))
 }

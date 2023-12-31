@@ -10,59 +10,6 @@ import "context"
 import "io"
 import "bytes"
 
-func spotifyWebplayer(token string) templ.ComponentScript {
-	return templ.ComponentScript{
-		Name: `__templ_spotifyWebplayer_8e4c`,
-		Function: `function __templ_spotifyWebplayer_8e4c(token){window.onSpotifyWebPlaybackSDKReady = () => {
-        console.log('onSpotifyWebPlaybackSDKReady')
-        const player = new window.Spotify.Player({
-            name: 'Web Playback SDK',
-            getOAuthToken: cb => { cb(token); },
-        });
-        const playButton = document.getElementById('playButton')
-        player.addListener('ready', ({ device_id }) => {
-            console.log('Ready with Device ID', device_id);
-            window.backintime = {} 
-            window.backintime.device_id = device_id
-            playButton.addEventListener('click', () => {
-            player.activateElement();
-});
-        });
-
-        player.addListener('not_ready', ({ device_id }) => {
-            console.log('Device ID has gone offline', device_id);
-        });
-        
-        player.addListener('player_state_changed', ( state => {
-
-          if (!state) {
-            return;
-          }
-
-          player.getCurrentState().then( state => { 
-             if (!state) {
-                console.error('User is not playing music through the Web Playback SDK');
-                return;
-             }
-
-             var current_track = state.track_window.current_track;
-             var next_track = state.track_window.next_tracks[0];
-
-             console.log('Currently Playing', current_track);
-             console.log('Playing Next', next_track); 
-          });
-
-        }));
-
-
-        player.connect();
-
-    };}`,
-		Call:       templ.SafeScript(`__templ_spotifyWebplayer_8e4c`, token),
-		CallInline: templ.SafeScriptInline(`__templ_spotifyWebplayer_8e4c`, token),
-	}
-}
-
 func User(name string, token string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
@@ -76,7 +23,7 @@ func User(name string, token string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"mb-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -90,53 +37,11 @@ func User(name string, token string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><p>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var4 string = token
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><button id=\"playButton\" onClick=\"fetch(&#39;http://localhost:1312/play/florian.schildwaechter@gmail.com/&#39;+window.backintime.device_id)\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Var5 := `test`
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = spotifyWebplayer(token).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if !templ_7745c5c3_IsBuffer {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteTo(templ_7745c5c3_W)
-		}
-		return templ_7745c5c3_Err
-	})
-}
-
-func UserPage(name string, token string) templ.Component {
-	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
-		if !templ_7745c5c3_IsBuffer {
-			templ_7745c5c3_Buffer = templ.GetBuffer()
-			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var6 == nil {
-			templ_7745c5c3_Var6 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Layout(User(name, token)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Categories().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

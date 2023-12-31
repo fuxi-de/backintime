@@ -1,0 +1,15 @@
+package templates
+
+templ Login() {
+	<div style="box-shadow:8px 8px black" class="border-4 border-solid border-black p-12 w-6/12 h-auto m-auto text-xl">
+		<p>
+			To use BackInTime you need to log in with your Spotify account.
+			Click beneath button to do so!
+		</p>
+		<a href="/auth/login" style="box-shadow:4px 4px black" class="block w-fit border-2 border-solid border-black px-4 py-2 mt-4 hover:bg-sky-700 hover:text-white">Login</a>
+	</div>
+}
+
+templ LoginPage() {
+	@Layout(Login())
+}
