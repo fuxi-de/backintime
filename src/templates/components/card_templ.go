@@ -12,17 +12,19 @@ import "bytes"
 
 func triggerPlayback(category string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_triggerPlayback_efc6`,
-		Function: `function __templ_triggerPlayback_efc6(category){const token = localStorage.getItem("backInTime-token")
+		Name: `__templ_triggerPlayback_ee1e`,
+		Function: `function __templ_triggerPlayback_ee1e(category){const token = localStorage.getItem("backInTime-token")
   const playButton = document.getElementById(category)
-    playButton.addEventListener("click", () => fetch('http://localhost:1312/user/play/'+window.backintime.device_id+'/'+category, {
-		  method: 'GET',
-		  headers: {
-			  'Authorization': 'Bearer '+token,
-		  },
-	  }))}`,
-		Call:       templ.SafeScript(`__templ_triggerPlayback_efc6`, category),
-		CallInline: templ.SafeScriptInline(`__templ_triggerPlayback_efc6`, category),
+    playButton.addEventListener("click", () => {
+      fetch('http://localhost:1312/user/play/'+window.backintime.device_id+'/'+category, {
+		    method: 'GET',
+		    headers: {
+			    'Authorization': 'Bearer '+token,
+		    },
+	    })
+    })}`,
+		Call:       templ.SafeScript(`__templ_triggerPlayback_ee1e`, category),
+		CallInline: templ.SafeScriptInline(`__templ_triggerPlayback_ee1e`, category),
 	}
 }
 

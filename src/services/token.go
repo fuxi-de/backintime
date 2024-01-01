@@ -1,14 +1,12 @@
 package services
 
 import (
-	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 
 	"github.com/google/uuid"
 )
@@ -111,40 +109,3 @@ func (tokenService *TokenService) CreateNewUser(tokenResponse string) *TokenEntr
 // 	json.Unmarshal([]byte(token), &accessToken)
 // 	return &accessToken
 // }
-
-func (tokenService *TokenService) PlaySong(song string, token string, deviceId string) {
-	fmt.Println("playing song: " + song)
-
-	spotifyPlayerEndpoint := "https://api.spotify.com/v1/me/player/play"
-
-	params := url.Values{}
-	params.Add("device_id", deviceId)
-
-	baseurl, err := url.Parse(spotifyPlayerEndpoint)
-	if err != nil {
-		fmt.Println("Malformed URL: ", err.Error())
-		panic(err)
-	}
-	baseurl.RawQuery = params.Encode()
-
-	playerEndpoint := baseurl.String()
-
-	jsonBody := []byte(`{"context_uri": "spotify:playlist:` + song + `", "position_ms": 0}`)
-	body := bytes.NewReader(jsonBody)
-	fmt.Println(body)
-	r, err := http.NewRequest("PUT", playerEndpoint, body)
-
-	r.Header.Add("Authorization", "Bearer "+token)
-	if err != nil {
-		panic(err)
-	}
-
-	client := &http.Client{}
-	res, err := client.Do(r)
-	if err != nil {
-		panic(err)
-	}
-	defer res.Body.Close()
-
-	fmt.Println("res: " + res.Status)
-}

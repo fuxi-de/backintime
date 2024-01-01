@@ -3,12 +3,14 @@ package components
 script triggerPlayback(category string) {
   const token = localStorage.getItem("backInTime-token")
   const playButton = document.getElementById(category)
-    playButton.addEventListener("click", () => fetch('http://localhost:1312/user/play/'+window.backintime.device_id+'/'+category, {
-		  method: 'GET',
-		  headers: {
-			  'Authorization': 'Bearer '+token,
-		  },
-	  })) 
+    playButton.addEventListener("click", () => {
+      fetch('http://localhost:1312/user/play/'+window.backintime.device_id+'/'+category, {
+		    method: 'GET',
+		    headers: {
+			    'Authorization': 'Bearer '+token,
+		    },
+	    })
+    }) 
 }
 
 templ Card(headline string, subHeadline string, category string) {

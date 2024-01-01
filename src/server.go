@@ -47,6 +47,7 @@ func main() {
 	tokenService := &services.TokenService{
 		DB: db,
 	}
+	musicService := services.MusicService{}
 
 	e := echo.New()
 
@@ -143,7 +144,7 @@ func main() {
 		r.GET("/play/:device/:category", func(c echo.Context) error {
 			token := c.Get("token")
 			if str, ok := token.(string); ok {
-				tokenService.PlaySong(c.Param("category"), str, c.Param("device"))
+				musicService.PlaySong(c.Param("category"), str, c.Param("device"))
 				return c.String(200, "done")
 			} else {
 				return c.Redirect(302, "/login")
