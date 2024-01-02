@@ -33,16 +33,18 @@ func triggerPlayback(category string) templ.ComponentScript {
 
 func getSongInfo(category string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_getSongInfo_3cb9`,
-		Function: `function __templ_getSongInfo_3cb9(category){const revealButton = document.querySelector(".active .reveal")
+		Name: `__templ_getSongInfo_ce6d`,
+		Function: `function __templ_getSongInfo_ce6d(category){const token = localStorage.getItem("backInTime-token")
+    const revealButton = document.querySelector(".active .reveal")
     const activeCard = document.querySelector(".active")
     revealButton.addEventListener("click", () => {
-      activeCard.classList.remove("active")
       window.backintime.player.getCurrentState().then( state => { 
         if (!state) {
           console.error('User is not playing music through the Web Playback SDK');
           return;
         }
+
+        htmx.ajax('GET', ` + "`" + `/user/play/release/${state.track_window.current_track.id}` + "`" + `, { target: ".active .year", headers: { Authorization: "Bearer "+token}})
 
         var current_track = state.track_window.current_track;
         var next_track = state.track_window.next_tracks[0];
@@ -55,8 +57,8 @@ func getSongInfo(category string) templ.ComponentScript {
         interpret.textContent = current_track.artists[0].name
       });
     })}`,
-		Call:       templ.SafeScript(`__templ_getSongInfo_3cb9`, category),
-		CallInline: templ.SafeScriptInline(`__templ_getSongInfo_3cb9`, category),
+		Call:       templ.SafeScript(`__templ_getSongInfo_ce6d`, category),
+		CallInline: templ.SafeScriptInline(`__templ_getSongInfo_ce6d`, category),
 	}
 }
 

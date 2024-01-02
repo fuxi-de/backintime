@@ -17,15 +17,17 @@ script triggerPlayback(category string) {
 }
 
 script getSongInfo(category string) {
+    const token = localStorage.getItem("backInTime-token")
     const revealButton = document.querySelector(".active .reveal")
     const activeCard = document.querySelector(".active")
     revealButton.addEventListener("click", () => {
-      activeCard.classList.remove("active")
       window.backintime.player.getCurrentState().then( state => { 
         if (!state) {
           console.error('User is not playing music through the Web Playback SDK');
           return;
         }
+
+        htmx.ajax('GET', `/user/play/release/${state.track_window.current_track.id}`, { target: ".active .year", headers: { Authorization: "Bearer "+token}})
 
         var current_track = state.track_window.current_track;
         var next_track = state.track_window.next_tracks[0];

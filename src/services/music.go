@@ -19,7 +19,40 @@ type (
 			Total int `json:"total"`
 		}
 	}
+	TrackData struct {
+		Album struct {
+			ReleaseDate string `json:"release_date"`
+		}
+	}
 )
+
+func (musicService *MusicService) GetReleaseYear(songId string, token string) string {
+	fmt.Println("fetching ReleaseDate for " + songId)
+	spotifyTrackEndpoint := "https://api.spotify.com/v1/tracks/" + songId
+	r, err := http.NewRequest("GET", spotifyTrackEndpoint, nil)
+
+	r.Header.Add("Authorization", "Bearer "+token)
+	if err != nil {
+		panic(err)
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(r)
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
+
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var trackData TrackData
+	json.Unmarshal([]byte(b), &trackData)
+	fmt.Println("release " + trackData.Album.ReleaseDate)
+	return trackData.Album.ReleaseDate
+}
 
 func (musicService *MusicService) PlaySong(playlistUri string, token string, deviceId string) {
 	fmt.Println("playing uri: " + playlistUri)

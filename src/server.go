@@ -155,6 +155,15 @@ func main() {
 				return c.Redirect(302, "/login")
 			}
 		})
+		r.GET("/play/release/:id", func(c echo.Context) error {
+			token := c.Get("token")
+			if str, ok := token.(string); ok {
+				releaseDate := musicService.GetReleaseYear(c.Param("id"), str)
+				return c.String(200, releaseDate)
+			} else {
+				return c.Redirect(302, "/login")
+			}
+		})
 
 	}
 
