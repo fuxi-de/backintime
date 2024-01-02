@@ -1,0 +1,46 @@
+package templates
+
+import "fuxifuchs/backintime/src/templates/components"
+
+script spotifyWebplayer() {
+  console.log('initting spotify player')
+  const token = localStorage.getItem("backInTime-token")
+  console.log(token)
+  window.onSpotifyWebPlaybackSDKReady = () => {
+        console.log('onSpotifyWebPlaybackSDKReady')
+        const player = new window.Spotify.Player({
+            name: 'Web Playback SDK',
+            getOAuthToken: cb => { cb(token); },
+        });
+        player.addListener('ready', ({ device_id }) => {
+            console.log('Ready with Device ID', device_id);
+            window.backintime = {} 
+            window.backintime.device_id = device_id
+            window.backintime.player = player
+        });
+
+        player.addListener('not_ready', ({ device_id }) => {
+            console.log('Device ID has gone offline', device_id);
+        });
+
+        player.connect();
+
+    };
+}
+
+templ play(playlistUri string) {
+	<section class="flex gap-8">
+		@spotifyWebplayer()
+		@components.Card(playlistUri)
+		<div style="box-shadow:8px 8px black" class="border-4 border-dashed border-black p-3 flex">
+			<button class="text-3xl p-12 hover:bg-black hover:text-white rounded" type="button">
+				+ add Card
+			</button>
+		</div>
+	</section>
+	<script async src="https://sdk.scdn.co/spotify-player.js"></script>
+}
+
+templ PlayPage(playlistUri string) {
+	@Layout(play(playlistUri))
+}

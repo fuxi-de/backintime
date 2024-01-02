@@ -1,0 +1,11 @@
+package components
+
+script handleDynamicContent(path string) {
+  const token = localStorage.getItem("backInTime-token")
+  setTimeout(() => htmx.ajax('GET', path, { target: "#content", headers: { Authorization: "Bearer "+token}}), 3000)
+}
+
+templ DynamicAuthContent(name string) {
+	<section id="content"></section>
+	@handleDynamicContent("/user/")
+}

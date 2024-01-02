@@ -1,0 +1,7 @@
+package templates
+
+import "fuxifuchs/backintime/src/templates/components"
+
+templ HomePage(name string) {
+	@Layout(components.DynamicAuthContent("/user/"))
+}

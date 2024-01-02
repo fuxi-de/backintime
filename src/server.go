@@ -47,7 +47,7 @@ func main() {
 	tokenService := &services.TokenService{
 		DB: db,
 	}
-	musicService := services.MusicService{}
+	musicService := &services.MusicService{}
 
 	e := echo.New()
 
@@ -58,6 +58,11 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		homepage := templates.HomePage("Florian")
 		return homepage.Render(context.Background(), c.Response().Writer)
+	})
+
+	e.GET("/play/:playlistUri", func(c echo.Context) error {
+		playPage := templates.PlayPage(c.Param("playlistUri"))
+		return playPage.Render(context.Background(), c.Response().Writer)
 	})
 
 	e.GET("/login", func(c echo.Context) error {

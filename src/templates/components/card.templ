@@ -2,7 +2,8 @@ package components
 
 script triggerPlayback(category string) {
   const token = localStorage.getItem("backInTime-token")
-  const playButton = document.getElementById(category)
+  const playButton = document.querySelector(".active .play")
+  const revealButton = document.querySelector(".active .reveal")
     playButton.addEventListener("click", () => {
       fetch('http://localhost:1312/user/play/'+window.backintime.device_id+'/'+category, {
 		    method: 'GET',
@@ -10,25 +11,56 @@ script triggerPlayback(category string) {
 			    'Authorization': 'Bearer '+token,
 		    },
 	    })
+      playButton.classList.add("hidden")
+      revealButton.classList.remove("hidden")
     }) 
 }
 
-templ Card(headline string, subHeadline string, category string) {
-	<div style="box-shadow:8px 8px black" class="w-fit border-4 border-solid border-black p-3">
+script getSongInfo(category string) {
+    const revealButton = document.querySelector(".active .reveal")
+    const activeCard = document.querySelector(".active")
+    revealButton.addEventListener("click", () => {
+      activeCard.classList.remove("active")
+      window.backintime.player.getCurrentState().then( state => { 
+        if (!state) {
+          console.error('User is not playing music through the Web Playback SDK');
+          return;
+        }
+
+        var current_track = state.track_window.current_track;
+        var next_track = state.track_window.next_tracks[0];
+
+        window.backintime.player.pause()
+        const wrapper = document.querySelector(".active")
+        const title = wrapper.querySelector(".title")
+        title.textContent = current_track.name
+        const interpret = wrapper.querySelector(".interpret")
+        interpret.textContent = current_track.artists[0].name
+      });
+    })
+}
+
+templ Card(category string) {
+	<div style="box-shadow:8px 8px black" class="w-fit border-4 border-solid border-black p-3 active">
 		<div class="group relative">
 			<img class="w-full md:w-72 block rounded opacity-0 " src="https://upload.wikimedia.org/wikipedia/en/f/f1/Tycho_-_Epoch.jpg" alt=""/>
 			<div class="absolute rounded w-full h-full top-0 flex items-center justify-evenly bg-transparent group-hover:bg-black group-hover:cursor-pointer">
-				<button id={ category } class="text-black scale-150 group-hover:text-white">
+				<button class="play text-black scale-150 group-hover:text-white">
 					<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-play-circle-fill" viewBox="0 0 16 16">
 						<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"></path>
 					</svg>
 				</button>
+				<button class="reveal hidden group-hover:text-white">
+					reveal
+				</button>
 			</div>
 		</div>
 		<div class="p-5">
-			<h3 class="text-black text-lg">{ headline }</h3>
-			<p class="text-gray-700">{ subHeadline }</p>
+			<h3 class="title text-black text-lg">Title</h3>
+			<p class="interpret text-gray-700">Interpret</p>
+			<p class="year text-gray-700">Year</p>
 		</div>
 	</div>
 	@triggerPlayback(category)
+	@getSongInfo(category)
 }
