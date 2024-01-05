@@ -33,8 +33,12 @@ func main() {
 	defer db.Close()
 
 	sqlStmt := `
-	create table if not exists tokens (id text not null primary key, token text not null, refresh_token text not null, expires integer not null);
-	`
+	create table if not exists tokens (id text not null primary key, mail text unique not null, token text not null, refresh_token text not null, expires integer not null);
+	create table if not exists games (
+    id text not null primary key, user text not null, state text,
+    FOREIGN KEY(user) REFERENCES tokens(id)
+  )
+  `
 	_, err = db.Exec(sqlStmt)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
@@ -48,6 +52,9 @@ func main() {
 		DB: db,
 	}
 	musicService := &services.MusicService{}
+	gameService := &services.GameService{
+		DB: db,
+	}
 
 	e := echo.New()
 
@@ -122,6 +129,7 @@ func main() {
 		if err != nil {
 			log.Fatalln(err)
 		}
+		log.Default().Println(string(b))
 		tokenEntry := tokenService.CreateNewUser(string(b))
 		callbackPage := templates.CallbackPage(tokenEntry.Token)
 		return callbackPage.Render(context.Background(), c.Response().Writer)
@@ -138,33 +146,26 @@ func main() {
 		r.Use(middleware.Auth)
 		r.GET("/", func(c echo.Context) error {
 			fmt.Println("/user/ called")
-			token := c.Get("token")
-			if str, ok := token.(string); ok {
-				userPage := templates.User("Flo", str)
-				return userPage.Render(context.Background(), c.Response().Writer)
-			} else {
-				return c.Redirect(302, "/login")
-			}
+			token := c.Get("token").(string)
+			userPage := templates.User("Flo", token)
+			return userPage.Render(context.Background(), c.Response().Writer)
 		})
 		r.GET("/play/:device/:category", func(c echo.Context) error {
-			token := c.Get("token")
-			if str, ok := token.(string); ok {
-				musicService.PlaySong(c.Param("category"), str, c.Param("device"))
-				return c.String(200, "done")
-			} else {
-				return c.Redirect(302, "/login")
-			}
+			token := c.Get("token").(string)
+			musicService.PlaySong(c.Param("category"), token, c.Param("device"))
+			return c.String(200, "done")
 		})
 		r.GET("/play/release/:id", func(c echo.Context) error {
-			token := c.Get("token")
-			if str, ok := token.(string); ok {
-				releaseDate := musicService.GetReleaseYear(c.Param("id"), str)
-				return c.String(200, releaseDate)
-			} else {
-				return c.Redirect(302, "/login")
-			}
+			token := c.Get("token").(string)
+			releaseDate := musicService.GetReleaseYear(c.Param("id"), token)
+			return c.String(200, releaseDate)
 		})
-
+		r.POST("/play/game/new", func(c echo.Context) error {
+			fmt.Println("new game endpoint called")
+			token := c.Get("token").(string)
+			gameEntry := gameService.CreateGame(token, *tokenService)
+			return c.JSON(http.StatusAccepted, gameEntry)
+		})
 	}
 
 	e.Logger.Fatal(e.Start(":1312"))

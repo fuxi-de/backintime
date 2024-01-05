@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 )
 
@@ -51,7 +52,11 @@ func (musicService *MusicService) GetReleaseYear(songId string, token string) st
 	var trackData TrackData
 	json.Unmarshal([]byte(b), &trackData)
 	fmt.Println("release " + trackData.Album.ReleaseDate)
-	return trackData.Album.ReleaseDate
+
+	re := regexp.MustCompile(`\b\d{4}\b`)
+	releaseYear := re.FindString(trackData.Album.ReleaseDate)
+
+	return releaseYear
 }
 
 func (musicService *MusicService) PlaySong(playlistUri string, token string, deviceId string) {

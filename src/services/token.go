@@ -21,6 +21,7 @@ type UserResponse struct {
 }
 
 type TokenData struct {
+	Mail         string `json:"mail"`
 	Token        string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	Expires      int    `json:"expires_in"`
@@ -37,10 +38,16 @@ func (tokenService *TokenService) SaveUser(tokenData TokenData) *TokenEntry {
 		TokenData: tokenData,
 	}
 
+	tokenEntry.Mail = tokenService.GetUserInfo(tokenEntry.Token).Mail
+
 	sqlStmt := `
-	insert into tokens(id, token, refresh_token, expires) values(?, ?, ?, ?)
+	insert into tokens(id, mail, token, refresh_token, expires) values(?, ?, ?, ?, ?)
+    on conflict do update set 
+      token=excluded.token,
+      refresh_token=excluded.refresh_token,
+      expires=excluded.expires
 	`
-	_, err := tokenService.DB.Exec(sqlStmt, tokenEntry.ID, tokenEntry.Token, tokenEntry.RefreshToken, tokenEntry.Expires)
+	_, err := tokenService.DB.Exec(sqlStmt, tokenEntry.ID, tokenEntry.Mail, tokenEntry.Token, tokenEntry.RefreshToken, tokenEntry.Expires)
 	if err != nil {
 		log.Printf("%q: %s\n", err, sqlStmt)
 		return nil
@@ -88,6 +95,22 @@ func (tokenService *TokenService) CreateNewUser(tokenResponse string) *TokenEntr
 	fmt.Println(token)
 
 	return tokenService.SaveUser(token)
+}
+
+func (tokenService *TokenService) GetIdByToken(token string) *string {
+	stmt, err := tokenService.DB.Prepare("select id from tokens where token = ?")
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	defer stmt.Close()
+	var id string
+	err = stmt.QueryRow(token).Scan(&id)
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
+	return &id
 }
 
 // func (tokenService *TokenService) GetAccessToken(email string) *TokenResponse {
