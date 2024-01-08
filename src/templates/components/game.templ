@@ -1,0 +1,16 @@
+package components
+
+import "fuxifuchs/backintime/src/services"
+
+templ Game(playlistUri string, gameEntry services.GameEntry) {
+	{ gameEntry.GameState }
+	<section class="flex gap-8">
+		@Card(playlistUri)
+		<div style="box-shadow:8px 8px black" class="border-4 border-dashed border-black p-3 flex">
+			<button class="text-3xl p-12 hover:bg-black hover:text-white rounded" type="button">
+				+ add Card
+			</button>
+		</div>
+	</section>
+	@SpotifyPlayer()
+}

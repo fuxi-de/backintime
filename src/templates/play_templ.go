@@ -10,36 +10,16 @@ import "context"
 import "io"
 import "bytes"
 
-import "fuxifuchs/backintime/src/templates/components"
-
-func spotifyWebplayer() templ.ComponentScript {
+func handleNewGame(playlistUri string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_spotifyWebplayer_18bc`,
-		Function: `function __templ_spotifyWebplayer_18bc(){console.log('initting spotify player')
-  const token = localStorage.getItem("backInTime-token")
-  console.log(token)
-  window.onSpotifyWebPlaybackSDKReady = () => {
-        console.log('onSpotifyWebPlaybackSDKReady')
-        const player = new window.Spotify.Player({
-            name: 'Web Playback SDK',
-            getOAuthToken: cb => { cb(token); },
-        });
-        player.addListener('ready', ({ device_id }) => {
-            console.log('Ready with Device ID', device_id);
-            window.backintime = {} 
-            window.backintime.device_id = device_id
-            window.backintime.player = player
-        });
-
-        player.addListener('not_ready', ({ device_id }) => {
-            console.log('Device ID has gone offline', device_id);
-        });
-
-        player.connect();
-
-    };}`,
-		Call:       templ.SafeScript(`__templ_spotifyWebplayer_18bc`),
-		CallInline: templ.SafeScriptInline(`__templ_spotifyWebplayer_18bc`),
+		Name: `__templ_handleNewGame_2c15`,
+		Function: `function __templ_handleNewGame_2c15(playlistUri){const token = localStorage.getItem("backInTime-token")
+  const newGameButton = document.getElementById("new-game")
+  newGameButton.addEventListener("click", () => {
+    htmx.ajax('POST', "/user/play/game/new/"+playlistUri, { target: "#content", headers: { Authorization: "Bearer "+token}})
+  })}`,
+		Call:       templ.SafeScript(`__templ_handleNewGame_2c15`, playlistUri),
+		CallInline: templ.SafeScriptInline(`__templ_handleNewGame_2c15`, playlistUri),
 	}
 }
 
@@ -56,37 +36,20 @@ func play(playlistUri string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"flex gap-8\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"new-game\" style=\"box-shadow:8px 8px black\" class=\"border-4 border-solid border-black p-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = spotifyWebplayer().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = components.Card(playlistUri).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div style=\"box-shadow:8px 8px black\" class=\"border-4 border-dashed border-black p-3 flex\"><button class=\"text-3xl p-12 hover:bg-black hover:text-white rounded\" type=\"button\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Var2 := `+ add Card`
+		templ_7745c5c3_Var2 := `new game`
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button></div></section><script async src=\"https://sdk.scdn.co/spotify-player.js\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button><div id=\"content\" class=\"my-8\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Var3 := ``
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script>")
+		templ_7745c5c3_Err = handleNewGame(playlistUri).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -105,9 +68,9 @@ func PlayPage(playlistUri string) templ.Component {
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var4 == nil {
-			templ_7745c5c3_Var4 = templ.NopComponent
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = Layout(play(playlistUri)).Render(ctx, templ_7745c5c3_Buffer)
