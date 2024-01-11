@@ -2,6 +2,32 @@ package components
 
 import "fuxifuchs/backintime/src/services"
 
+script sortable() {
+  htmx.onLoad(function(content) {
+    console.log('initting sortable', content)
+    var sortables = document.querySelectorAll(".sortable");
+    console.log(sortables)
+    for (var i = 0; i < sortables.length; i++) {
+      var sortable = sortables[i];
+      var sortableInstance = new Sortable(sortable, {
+          animation: 150,
+
+          // Make the `.htmx-indicator` unsortable
+          filter: ".htmx-indicator",
+          onMove: function (evt) {
+            return evt.related.className.indexOf('htmx-indicator') === -1;
+          },
+
+     });
+
+      // Re-enable sorting on the `htmx:afterSwap` event
+      sortable.addEventListener("htmx:afterSwap", function() {
+        sortableInstance.option("disabled", false);
+      });
+    }
+  })
+}
+
 script handleAddCard(playlistUri string) {
     const token = localStorage.getItem("backInTime-token")
     const addButton = document.querySelector(".add-card-button")
@@ -19,7 +45,7 @@ script handleAddCard(playlistUri string) {
 
 templ Game(playlistUri string, gameEntry services.GameEntry) {
 	<section class="flex gap-8">
-		<div class="card-wrapper flex gap-8">
+		<div class="card-wrapper flex gap-8 sortable">
 			@Card(playlistUri)
 		</div>
 		<div style="box-shadow:8px 8px black" class="border-4 border-dashed border-black p-3 flex">
@@ -29,5 +55,6 @@ templ Game(playlistUri string, gameEntry services.GameEntry) {
 		</div>
 	</section>
 	@SpotifyPlayer()
+	@sortable()
 	@handleAddCard(playlistUri)
 }

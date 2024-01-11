@@ -12,6 +12,38 @@ import "bytes"
 
 import "fuxifuchs/backintime/src/services"
 
+func sortable() templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_sortable_2c1d`,
+		Function: `function __templ_sortable_2c1d(){htmx.onLoad(function(content) {
+    console.log('initting sortable', content)
+    var sortables = document.querySelectorAll(".sortable");
+    console.log(sortables)
+    for (var i = 0; i < sortables.length; i++) {
+      var sortable = sortables[i];
+      var sortableInstance = new Sortable(sortable, {
+          animation: 150,
+
+          // Make the ` + "`" + `.htmx-indicator` + "`" + ` unsortable
+          filter: ".htmx-indicator",
+          onMove: function (evt) {
+            return evt.related.className.indexOf('htmx-indicator') === -1;
+          },
+
+          // Disable sorting on the ` + "`" + `end` + "`" + ` event
+     });
+
+      // Re-enable sorting on the ` + "`" + `htmx:afterSwap` + "`" + ` event
+      sortable.addEventListener("htmx:afterSwap", function() {
+        sortableInstance.option("disabled", false);
+      });
+    }
+  })}`,
+		Call:       templ.SafeScript(`__templ_sortable_2c1d`),
+		CallInline: templ.SafeScriptInline(`__templ_sortable_2c1d`),
+	}
+}
+
 func handleAddCard(playlistUri string) templ.ComponentScript {
 	return templ.ComponentScript{
 		Name: `__templ_handleAddCard_7136`,
@@ -45,7 +77,7 @@ func Game(playlistUri string, gameEntry services.GameEntry) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"flex gap-8\"><div class=\"card-wrapper flex gap-8\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"flex gap-8\"><div class=\"card-wrapper flex gap-8 sortable\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -67,6 +99,10 @@ func Game(playlistUri string, gameEntry services.GameEntry) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = SpotifyPlayer().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = sortable().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
