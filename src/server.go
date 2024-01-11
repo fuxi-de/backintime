@@ -161,6 +161,11 @@ func main() {
 			releaseDate := musicService.GetReleaseYear(c.Param("id"), token)
 			return c.String(200, releaseDate)
 		})
+		r.GET("/play/newCard/:playlistUri", func(c echo.Context) error {
+			playlistUri := c.Param("playlistUri")
+			card := components.Card(playlistUri)
+			return card.Render(context.Background(), c.Response().Writer)
+		})
 		r.POST("/play/game/new/:playlistUri", func(c echo.Context) error {
 			fmt.Println("new game endpoint called")
 			playlistUri := c.Param("playlistUri")

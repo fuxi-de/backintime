@@ -8,11 +8,14 @@ script handleNewGame(playlistUri string) {
   })
 }
 
+//TODO gameplay. Write Gamestate (correct order) serverside on playback trigger and compare on frontend after placing tile.
+
 templ play(playlistUri string) {
-	<button id="new-game" style="box-shadow:8px 8px black" class="border-4 border-solid border-black p-8">
-		new game
-	</button>
-	<div id="content" class="my-8"></div>
+	<div id="content" class="my-8">
+		<button id="new-game" style="box-shadow:8px 8px black" class="border-4 border-solid border-black p-8">
+			new game
+		</button>
+	</div>
 	@handleNewGame(playlistUri)
 }
 

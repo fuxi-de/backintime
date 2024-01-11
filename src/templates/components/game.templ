@@ -2,15 +2,32 @@ package components
 
 import "fuxifuchs/backintime/src/services"
 
+script handleAddCard(playlistUri string) {
+    const token = localStorage.getItem("backInTime-token")
+    const addButton = document.querySelector(".add-card-button")
+    addButton.addEventListener("click", () => {
+      addButton.disabled = true
+      htmx.ajax('GET', "/user/play/newCard/"+playlistUri, { 
+        target: ".card-wrapper", 
+        swap: "beforeend",
+        headers: { 
+          Authorization: "Bearer "+token
+        }
+      })
+    })
+}
+
 templ Game(playlistUri string, gameEntry services.GameEntry) {
-	{ gameEntry.GameState }
 	<section class="flex gap-8">
-		@Card(playlistUri)
+		<div class="card-wrapper flex gap-8">
+			@Card(playlistUri)
+		</div>
 		<div style="box-shadow:8px 8px black" class="border-4 border-dashed border-black p-3 flex">
-			<button class="text-3xl p-12 hover:bg-black hover:text-white rounded" type="button">
+			<button disabled class="add-card-button text-3xl p-12 hover:bg-black hover:text-white rounded" type="button">
 				+ add Card
 			</button>
 		</div>
 	</section>
 	@SpotifyPlayer()
+	@handleAddCard(playlistUri)
 }

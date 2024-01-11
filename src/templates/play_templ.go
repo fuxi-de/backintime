@@ -23,6 +23,8 @@ func handleNewGame(playlistUri string) templ.ComponentScript {
 	}
 }
 
+//TODO gameplay. Write Gamestate (correct order) serverside on playback trigger and compare on frontend after placing tile.
+
 func play(playlistUri string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
@@ -36,7 +38,7 @@ func play(playlistUri string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"new-game\" style=\"box-shadow:8px 8px black\" class=\"border-4 border-solid border-black p-8\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"content\" class=\"my-8\"><button id=\"new-game\" style=\"box-shadow:8px 8px black\" class=\"border-4 border-solid border-black p-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -45,7 +47,7 @@ func play(playlistUri string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button><div id=\"content\" class=\"my-8\"></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

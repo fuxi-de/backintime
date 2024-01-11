@@ -12,10 +12,11 @@ import "bytes"
 
 func triggerPlayback(category string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_triggerPlayback_7be3`,
-		Function: `function __templ_triggerPlayback_7be3(category){const token = localStorage.getItem("backInTime-token")
+		Name: `__templ_triggerPlayback_5ae6`,
+		Function: `function __templ_triggerPlayback_5ae6(category){const token = localStorage.getItem("backInTime-token")
   const playButton = document.querySelector(".active .play")
   const revealButton = document.querySelector(".active .reveal")
+  console.log(window.backintime)
     playButton.addEventListener("click", () => {
       fetch('http://localhost:1312/user/play/'+window.backintime.device_id+'/'+category, {
 		    method: 'GET',
@@ -26,17 +27,18 @@ func triggerPlayback(category string) templ.ComponentScript {
       playButton.classList.add("hidden")
       revealButton.classList.remove("hidden")
     })}`,
-		Call:       templ.SafeScript(`__templ_triggerPlayback_7be3`, category),
-		CallInline: templ.SafeScriptInline(`__templ_triggerPlayback_7be3`, category),
+		Call:       templ.SafeScript(`__templ_triggerPlayback_5ae6`, category),
+		CallInline: templ.SafeScriptInline(`__templ_triggerPlayback_5ae6`, category),
 	}
 }
 
 func getSongInfo(category string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_getSongInfo_ce6d`,
-		Function: `function __templ_getSongInfo_ce6d(category){const token = localStorage.getItem("backInTime-token")
+		Name: `__templ_getSongInfo_81aa`,
+		Function: `function __templ_getSongInfo_81aa(category){const token = localStorage.getItem("backInTime-token")
     const revealButton = document.querySelector(".active .reveal")
     const activeCard = document.querySelector(".active")
+    const addButton = document.querySelector(".add-card-button")
     revealButton.addEventListener("click", () => {
       window.backintime.player.getCurrentState().then( state => { 
         if (!state) {
@@ -55,10 +57,12 @@ func getSongInfo(category string) templ.ComponentScript {
         title.textContent = current_track.name
         const interpret = wrapper.querySelector(".interpret")
         interpret.textContent = current_track.artists[0].name
+        addButton.disabled = false
+        activeCard.classList.remove('active')
       });
     })}`,
-		Call:       templ.SafeScript(`__templ_getSongInfo_ce6d`, category),
-		CallInline: templ.SafeScriptInline(`__templ_getSongInfo_ce6d`, category),
+		Call:       templ.SafeScript(`__templ_getSongInfo_81aa`, category),
+		CallInline: templ.SafeScriptInline(`__templ_getSongInfo_81aa`, category),
 	}
 }
 

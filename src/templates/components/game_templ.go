@@ -12,6 +12,26 @@ import "bytes"
 
 import "fuxifuchs/backintime/src/services"
 
+func handleAddCard(playlistUri string) templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_handleAddCard_7136`,
+		Function: `function __templ_handleAddCard_7136(playlistUri){const token = localStorage.getItem("backInTime-token")
+    const addButton = document.querySelector(".add-card-button")
+    addButton.addEventListener("click", () => {
+      addButton.disabled = true
+      htmx.ajax('GET', "/user/play/newCard/"+playlistUri, { 
+        target: ".card-wrapper", 
+        swap: "beforeend",
+        headers: { 
+          Authorization: "Bearer "+token
+        }
+      })
+    })}`,
+		Call:       templ.SafeScript(`__templ_handleAddCard_7136`, playlistUri),
+		CallInline: templ.SafeScriptInline(`__templ_handleAddCard_7136`, playlistUri),
+	}
+}
+
 func Game(playlistUri string, gameEntry services.GameEntry) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
@@ -25,12 +45,7 @@ func Game(playlistUri string, gameEntry services.GameEntry) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 string = gameEntry.GameState
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"flex gap-8\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"flex gap-8\"><div class=\"card-wrapper flex gap-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -38,12 +53,12 @@ func Game(playlistUri string, gameEntry services.GameEntry) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div style=\"box-shadow:8px 8px black\" class=\"border-4 border-dashed border-black p-3 flex\"><button class=\"text-3xl p-12 hover:bg-black hover:text-white rounded\" type=\"button\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div style=\"box-shadow:8px 8px black\" class=\"border-4 border-dashed border-black p-3 flex\"><button disabled class=\"add-card-button text-3xl p-12 hover:bg-black hover:text-white rounded\" type=\"button\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Var3 := `+ add Card`
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+		templ_7745c5c3_Var2 := `+ add Card`
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -52,6 +67,10 @@ func Game(playlistUri string, gameEntry services.GameEntry) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = SpotifyPlayer().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = handleAddCard(playlistUri).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -4,6 +4,7 @@ script triggerPlayback(category string) {
   const token = localStorage.getItem("backInTime-token")
   const playButton = document.querySelector(".active .play")
   const revealButton = document.querySelector(".active .reveal")
+  console.log(window.backintime)
     playButton.addEventListener("click", () => {
       fetch('http://localhost:1312/user/play/'+window.backintime.device_id+'/'+category, {
 		    method: 'GET',
@@ -20,6 +21,7 @@ script getSongInfo(category string) {
     const token = localStorage.getItem("backInTime-token")
     const revealButton = document.querySelector(".active .reveal")
     const activeCard = document.querySelector(".active")
+    const addButton = document.querySelector(".add-card-button")
     revealButton.addEventListener("click", () => {
       window.backintime.player.getCurrentState().then( state => { 
         if (!state) {
@@ -38,6 +40,8 @@ script getSongInfo(category string) {
         title.textContent = current_track.name
         const interpret = wrapper.querySelector(".interpret")
         interpret.textContent = current_track.artists[0].name
+        addButton.disabled = false
+        activeCard.classList.remove('active')
       });
     })
 }
