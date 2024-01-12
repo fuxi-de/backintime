@@ -14,8 +14,8 @@ import "fuxifuchs/backintime/src/services"
 
 func sortable() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_sortable_2c1d`,
-		Function: `function __templ_sortable_2c1d(){htmx.onLoad(function(content) {
+		Name: `__templ_sortable_115f`,
+		Function: `function __templ_sortable_115f(){htmx.onLoad(function(content) {
     console.log('initting sortable', content)
     var sortables = document.querySelectorAll(".sortable");
     console.log(sortables)
@@ -30,7 +30,6 @@ func sortable() templ.ComponentScript {
             return evt.related.className.indexOf('htmx-indicator') === -1;
           },
 
-          // Disable sorting on the ` + "`" + `end` + "`" + ` event
      });
 
       // Re-enable sorting on the ` + "`" + `htmx:afterSwap` + "`" + ` event
@@ -39,8 +38,8 @@ func sortable() templ.ComponentScript {
       });
     }
   })}`,
-		Call:       templ.SafeScript(`__templ_sortable_2c1d`),
-		CallInline: templ.SafeScriptInline(`__templ_sortable_2c1d`),
+		Call:       templ.SafeScript(`__templ_sortable_115f`),
+		CallInline: templ.SafeScriptInline(`__templ_sortable_115f`),
 	}
 }
 
@@ -77,7 +76,7 @@ func Game(playlistUri string, gameEntry services.GameEntry) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"flex gap-8\"><div class=\"card-wrapper flex gap-8 sortable\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"flex gap-8\"><div class=\"card-wrapper flex flex-none gap-8 sortable h-screen\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -85,7 +84,7 @@ func Game(playlistUri string, gameEntry services.GameEntry) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div style=\"box-shadow:8px 8px black\" class=\"border-4 border-dashed border-black p-3 flex\"><button disabled class=\"add-card-button text-3xl p-12 hover:bg-black hover:text-white rounded\" type=\"button\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div style=\"box-shadow:8px 8px black\" class=\"border-4 border-dashed border-black p-3 flex-none flex h-96\"><button disabled class=\"add-card-button text-3xl p-12 hover:bg-black hover:text-white rounded\" type=\"button\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
