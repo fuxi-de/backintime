@@ -44,8 +44,8 @@ script handleAddCard(playlistUri string) {
 }
 
 templ Game(playlistUri string, gameEntry services.GameEntry) {
-	<section class="flex gap-8">
-		<div class="card-wrapper flex flex-none gap-8 sortable h-screen">
+	<section class="flex gap-6">
+		<div class="card-wrapper flex flex-wrap gap-6 sortable h-dvh">
 			@Card(playlistUri)
 		</div>
 		<div style="box-shadow:8px 8px black" class="border-4 border-dashed border-black p-3 flex-none flex h-96">
